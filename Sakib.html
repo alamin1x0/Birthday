@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>Happy Birthday Dear</title>
+</head>
+<style>.nm-animate-opacity{
+        animation:opac 9s
+    }
+    @keyframes opac{
+        from{
+            opacity:0
+        }
+         to{
+            opacity:1
+        }
+    }
+    @import url(https://fonts.googleapis.com/css?family=Josefin+Sans:100,300);
+    
+    @font-face {
+      font-family: "Clicker Script";
+      src: local("Clicker Script"), local("ClickerScript-Regular"), url("https://fonts.gstatic.com/s/clickerscript/v5/raxkHiKPvt8CMH6ZWP8PdlEq71rf0Ts.woff2") format("woff2");
+      font-style: bold;
+      font-weight: 400;
+      unicode-range: U+0-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    }
+    
+    .inline-blocks > .block{
+      display: inline-block;
+      vertical-align: baseline;
+    }
+    .image{
+      width: 100px;
+      border-radius: 180px;
+      border: 3px solid #fff;
+      margin-top: 22px;
+      margin-right: 40px;
+      box-sizing: border-box;
+      
+    }
+    .twenty-1{
+      font:100 70px/1px 'Josefin Sans';
+      color: #fff;
+      margin: 40px 0 20px 0;
+    
+    }
+    
+    .name{
+      font-size: 50px;
+      font-family: 'Clicker Script';
+      font-weight: 700;
+      line-height: 50px;
+      color: green;
+      margin: 40px 0 20px 0;
+    }
+    
+    .bday{
+      font-size: 20px;
+      color: white;
+      font-family: 'Josefin Sans';
+      font-weight: 300;
+      text-align: center;
+      margin: 0;
+      padding-top:5px;
+    }
+    
+    .cover{
+      background: rgba(0,0,0,0.90);
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top:0;
+      left: 0;
+      z-index: 1000;
+    }
+    
+    #can{
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+    }
+    
+    
+    .super-centered-container{
+      display:flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    html,body{
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      background:#131313;
+      overflow:hidden;
+    }
+    
+    a{
+      color: skyblue;
+      text-decoration: none;
+    }
+    
+    .overlay-static{
+      position: relative;
+      z-index: 1000;
+      margin-bottom: 100px;
+    }
+    
+    body{
+      background-position: center center;
+      background-size: cover;
+    }</style>
+<body>
+
+       
+  <div class="cover super-centered-container">
+    <canvas id="can">Get a browser</canvas>
+    <div class="overlay-static nm-animate-opacity">    
+        <div class="inline-blocks">
+            <h4 class="name block">Sakib </h4>
+        </div>
+        <h1 class="bday"><b>Happy Birthday</b></h1>
+    </div>
+</div>
+             <!-- <canvas id="birthday"></canvas> -->
+  <script>
+  (function() {
+  var Firefly, TwoPI, alive_fireflies, canvas, center_x, center_y, colors, ctx, dt, fireflies, h, isOnHeart, last, last_emit, max_distance, max_fireflies, min_distance, now, render, w;
+  TwoPI = Math.PI * 2;
+  w = window.innerWidth;
+  h = window.innerHeight;
+  center_x = w / 2;
+  center_y = h / 2;
+  colors = ['#FFFFFF', '#FF4FA7', '#60EEE0'];
+  max_distance = Math.abs(Math.max(center_x, center_y));
+  min_distance = Math.abs(Math.min(center_x, center_y));
+  Firefly = function() {
+    var random_angle;
+    this.velocity = 0;
+    random_angle = Math.random() * TwoPI;
+    this.x = center_x + Math.sin(random_angle) * (Math.random() * (max_distance - min_distance) + min_distance);
+    this.y = center_y + Math.cos(random_angle) * (Math.random() * (max_distance - min_distance) + min_distance);
+    this.angle_of_attack = Math.atan2(this.y - center_y, this.x - center_x);
+    this.vel = (Math.random() * 5) + 5;
+    this.color = colors[~~(colors.length * Math.random())];
+    this.xvel = this.vel * Math.cos(this.angle_of_attack);
+    this.yvel = this.vel * Math.sin(this.angle_of_attack);
+    this.size = Math.random() * 3;
+    this.size += 1;
+    return this.phase_diff = Math.random() * TwoPI;
+  };
+
+  Firefly.prototype.move = function(dt) {
+    if (isOnHeart(this.x, this.y)) {
+      this.size -= 0.001;
+      return;
+    }
+    dt *= 1.3;
+    this.x += this.xvel * dt;
+    return this.y += this.yvel * dt;
+  };
+
+  Firefly.prototype.render = function(ctx, now) {
+    if (this.size < 1) {
+      return;
+    }
+    ctx.globalAlpha = Math.max(Math.abs(Math.sin((now + this.phase_diff) / (~~(this.size * 100)))), 0.05);
+    ctx.fillStyle = this.color;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, TwoPI, false);
+    ctx.closePath();
+    return ctx.fill();
+  };
+  max_fireflies = 333;
+
+  canvas = document.getElementById('can');
+
+  ctx = canvas.getContext('2d');
+
+  canvas.width = window.innerWidth;
+
+  canvas.height = window.innerHeight;
+
+  fireflies = [];
+
+  last = Date.now();
+
+  dt = 0;
+
+  now = 0;
+
+  alive_fireflies = 0;
+
+  last_emit = 0;
+  (render = function() {
+    now = Date.now();
+    dt = (last - now) / 500;
+    last = now;
+    ctx.clearRect(0, 0, w, h);
+    fireflies.forEach(function(f) {
+      f.move(dt);
+      return f.render(ctx, now);
+    });
+    fireflies = fireflies.filter(function(f) {
+      return f.size > 1;
+    });
+    alive_fireflies = fireflies.length;
+    if (alive_fireflies < max_fireflies && last_emit - now < -200) {
+      fireflies.push(new Firefly);
+      last_emit = now;
+    }
+    return requestAnimationFrame(render);
+  })();
+  isOnHeart = function(x, y) {
+    var x2, y2;
+    x = ((x - center_x) / (min_distance * 1.2)) * 1.8;
+    y = ((y - center_y) / min_distance) * -1.8;
+    x2 = x * x;
+    y2 = y * y;
+    return Math.pow(x2 + y2 - 1, 3) - (x2 * (y2 * y)) <= 0;
+  };
+}).call(this);
+</script>
+<!-- <script>
+// helper functions
+const PI2 = Math.PI * 2
+const random = (min, max) => Math.random() * (max - min + 1) + min | 0
+const timestamp = _ => new Date().getTime()
+
+// container
+class Birthday {
+  constructor() {
+    this.resize()
+
+    // create a lovely place to store the firework
+    this.fireworks = []
+    this.counter = 0
+
+  }
+  
+  resize() {
+    this.width = canvas.width = window.innerWidth
+    let center = this.width / 2 | 0
+    this.spawnA = center - center / 4 | 0
+    this.spawnB = center + center / 4 | 0
+    
+    this.height = canvas.height = window.innerHeight
+    this.spawnC = this.height * .1
+    this.spawnD = this.height * .5
+    
+  }
+  
+  onClick(evt) {
+     let x = evt.clientX || evt.touches && evt.touches[0].pageX
+     let y = evt.clientY || evt.touches && evt.touches[0].pageY
+     
+     let count = random(3,5)
+     for(let i = 0; i < count; i++) this.fireworks.push(new Firework(
+        random(this.spawnA, this.spawnB),
+        this.height,
+        x,
+        y,
+        random(0, 260),
+        random(30, 110)))
+          
+     this.counter = -1
+     
+  }
+  
+  update(delta) {
+    ctx.globalCompositeOperation = 'hard-light'
+    ctx.fillStyle = `rgba(20,20,20,${ 7 * delta })`
+    ctx.fillRect(0, 0, this.width, this.height)
+
+    ctx.globalCompositeOperation = 'lighter'
+    for (let firework of this.fireworks) firework.update(delta)
+
+    // if enough time passed... create new new firework
+    this.counter += delta * 3 // each second
+    if (this.counter >= 1) {
+      this.fireworks.push(new Firework(
+        random(this.spawnA, this.spawnB),
+        this.height,
+        random(0, this.width),
+        random(this.spawnC, this.spawnD),
+        random(0, 360),
+        random(30, 110)))
+      this.counter = 0
+    }
+
+    // remove the dead fireworks
+    if (this.fireworks.length > 1000) this.fireworks = this.fireworks.filter(firework => !firework.dead)
+
+  }
+}
+
+class Firework {
+  constructor(x, y, targetX, targetY, shade, offsprings) {
+    this.dead = false
+    this.offsprings = offsprings
+
+    this.x = x
+    this.y = y
+    this.targetX = targetX
+    this.targetY = targetY
+
+    this.shade = shade
+    this.history = []
+  }
+  update(delta) {
+    if (this.dead) return
+
+    let xDiff = this.targetX - this.x
+    let yDiff = this.targetY - this.y
+    if (Math.abs(xDiff) > 3 || Math.abs(yDiff) > 3) { // is still moving
+      this.x += xDiff * 2 * delta
+      this.y += yDiff * 2 * delta
+
+      this.history.push({
+        x: this.x,
+        y: this.y
+      })
+
+      if (this.history.length > 20) this.history.shift()
+
+    } else {
+      if (this.offsprings && !this.madeChilds) {
+        
+        let babies = this.offsprings / 2
+        for (let i = 0; i < babies; i++) {
+          let targetX = this.x + this.offsprings * Math.cos(PI2 * i / babies) | 0
+          let targetY = this.y + this.offsprings * Math.sin(PI2 * i / babies) | 0
+
+          birthday.fireworks.push(new Firework(this.x, this.y, targetX, targetY, this.shade, 0))
+
+        }
+
+      }
+      this.madeChilds = true
+      this.history.shift()
+    }
+    
+    if (this.history.length === 0) this.dead = true
+    else if (this.offsprings) { 
+        for (let i = 0; this.history.length > i; i++) {
+          let point = this.history[i]
+          ctx.beginPath()
+          ctx.fillStyle = 'hsl(' + this.shade + ',100%,' + i + '%)'
+          ctx.arc(point.x, point.y, 1, 0, PI2, false)
+          ctx.fill()
+        } 
+      } else {
+      ctx.beginPath()
+      ctx.fillStyle = 'hsl(' + this.shade + ',100%,50%)'
+      ctx.arc(this.x, this.y, 1, 0, PI2, false)
+      ctx.fill()
+    }
+
+  }
+}
+
+let canvas = document.getElementById('birthday')
+let ctx = canvas.getContext('2d')
+
+let then = timestamp()
+
+let birthday = new Birthday
+window.onresize = () => birthday.resize()
+document.onclick = evt => birthday.onClick(evt)
+document.ontouchstart = evt => birthday.onClick(evt)
+
+  ;(function loop(){
+  	requestAnimationFrame(loop)
+
+  	let now = timestamp()
+  	let delta = now - then
+
+    then = now
+    birthday.update(delta / 1000)
+  	
+
+  })()</script> -->
+</body>
+</html>
